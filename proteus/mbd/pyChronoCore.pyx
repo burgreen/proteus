@@ -206,6 +206,12 @@ cdef class ChBody(ChBodyFrame):
     cpdef void SetMaterialSurface(self, ChMaterialSurfaceSMC mat):
         deref(self.sharedptr_chbody).SetMaterialSurface(<shared_ptr[ch.ChMaterialSurface]> mat.sharedptr)
 
+    cpdef void SetCollide(self, bool state):
+        deref(self.sharedptr_chbody).SetCollide(state)
+
+    cpdef bool GetCollide(self):
+        return deref(self.sharedptr_chbody).GetCollide()
+
 
 cdef class ChBodyEasyBox(ChBody):
     """Cython class for ChBodyEasyBox

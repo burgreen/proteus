@@ -98,6 +98,7 @@ cdef extern from "ChMoorings.h":
                              const ChVector &pos,
                              const ChMatrix33 &rot,
                              double sphereswept_thickness)
+        void AddCylinder(double rx, double rz, double hy)
         void SetEnvelope(double amargin)
         void SetSafeMargin(double amargin)
         void ClearModel()
@@ -170,6 +171,13 @@ cdef extern from "ChMoorings.h":
                       double mdensity,
                       bool collide=False,
                       bool visual_asset=True)
+
+    cdef cppclass ChBodyEasyCylinder(ChBody):
+        ChBodyEasyCylinder(double radius,
+                           double height,
+                           double mdensity,
+                           bool collide=False,
+                           bool visual_asset=True)
 
 
     # ------- NODES ------- #

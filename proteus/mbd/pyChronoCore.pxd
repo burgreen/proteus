@@ -55,6 +55,8 @@ cdef class ChBody(ChBodyFrame):
     cdef shared_ptr[ch.ChBody] sharedptr_chbody
     cpdef void SetBodyFixed(self, bool state)
     cpdef void SetMaterialSurface(self, ChMaterialSurfaceSMC mat)
+    cpdef void SetCollide(self, bool state)
+    cpdef bool GetCollide(self)
 
 cdef class ChBodyEasyBox(ChBody):
     cdef shared_ptr[ch.ChBodyEasyBox] sharedptr_chbodyeasybox

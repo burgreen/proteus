@@ -417,6 +417,12 @@ cdef class ProtChBody:
         cdef ch.ChQuaternion rot0 = deref(self.thisptr.body).GetRot()
         self.thisptr.rotq0_trimesh = rot0
 
+    def addCylinderCollision(self, radiusx, radiusz, heighty):
+        deref(deref(self.thisptr.body).GetCollisionModel()).AddCylinder(radiusx,
+                                                                        radiusz,
+                                                                        heighty)
+
+
     # # (!) # cannot use right now because of cython error when C++ function has default
     # # (!) # arguments (known bug in cython community, silent error)
     # # (!) # logic left here for when cython bug is solved
