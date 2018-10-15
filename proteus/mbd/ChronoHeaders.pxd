@@ -102,6 +102,9 @@ cdef extern from "ChMoorings.h":
         void SetEnvelope(double amargin)
         void SetSafeMargin(double amargin)
         void ClearModel()
+        ball.addCylinderCollision(particle_diameter/2.,
+                                  particle_diameter/2.,
+                                  particle_height)
         void BuildModel()
 
     ChQuaternion Q_from_AngAxis(double angle,
