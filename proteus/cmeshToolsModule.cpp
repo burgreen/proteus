@@ -5,6 +5,9 @@
 #include <iostream>
 #include <map>
 #include <set>
+
+#include "msu/mesh_msu.h"
+
 /** \file cmeshToolsModule.cpp
     \defgroup cmeshTools cmeshTools
     \brief Python interface to mesh library 
@@ -120,6 +123,15 @@ static PyObject* cmeshToolsBuildPythonMeshInterface(PyObject* self,
     *elementIJK,             //NURBS
     *weights,                 //NURBS
     *U_KNOT, *V_KNOT,*W_KNOT; //NURBS
+  // msu data start
+  PyObject* attrF;
+  PyObject* nx_mean;
+  PyObject* ny_mean;
+  PyObject* nz_mean;
+  PyObject* nx_stddev;
+  PyObject* ny_stddev;
+  PyObject* nz_stddev;
+  // msu data end
   if (!PyArg_ParseTuple(args,
                         "O",
                         &cmesh))
@@ -298,7 +310,19 @@ static PyObject* cmeshToolsBuildPythonMeshInterface(PyObject* self,
 							    (char*)MESH(cmesh).W_KNOT);							    
 // NURBS
 
-  return Py_BuildValue("iiiiiiiiiiiOOOOOOOOOOOOOOOOOiiiiiiOOOOOOOOOOOOdddd",
+  // msu data start
+  dims[0] = MESH(cmesh).num_attrF;
+  attrF     = PyArray_FromDimsAndData( 1, dims, PyArray_INT,    (char*)MESH(cmesh).attrF );
+  nx_mean   = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).nx_mean );
+  ny_mean   = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).ny_mean );
+  nz_mean   = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).nz_mean );
+  nx_stddev = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).nx_stddev );
+  ny_stddev = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).ny_stddev );
+  nz_stddev = PyArray_FromDimsAndData( 1, dims, PyArray_DOUBLE, (char*)MESH(cmesh).nz_stddev );
+  // msu data end
+
+  // msu change to Py_BuildValues
+  return Py_BuildValue("iiiiiiiiiiiOOOOOOOOOOOOOOOOOiiiiiiOOOOOOOOOOOOdddiOOOOOOOiiid",
                        MESH(cmesh).nElements_global,
                        MESH(cmesh).nNodes_global,
                        MESH(cmesh).nNodes_element,
@@ -344,6 +368,19 @@ static PyObject* cmeshToolsBuildPythonMeshInterface(PyObject* self,
                        MESH(cmesh).h,
                        MESH(cmesh).hMin,
                        MESH(cmesh).sigmaMax,
+                       // msu data start
+                       MESH(cmesh).num_attrF,
+                       attrF,
+                       nx_mean,
+                       ny_mean,
+                       nz_mean,
+                       nx_stddev,
+                       ny_stddev,
+                       nz_stddev,
+                       MESH(cmesh).hex_nx,
+                       MESH(cmesh).hex_ny,
+                       MESH(cmesh).hex_nz,
+                       // msu data end
                        MESH(cmesh).volume);
 }
 
@@ -930,6 +967,76 @@ cmeshToolsGenerateFromTriangleFiles(PyObject* self,
   Py_INCREF(Py_None); 
   return Py_None;
 }
+
+// msu code start
+static PyObject* 
+cmeshTools_read_triangle( PyObject* self, PyObject* args )
+{
+  PyObject*   cmesh;
+  const char* filebase;
+  int         num_interiorEdgeTags;
+  PyObject*   interiorEdgeTags;
+  if( ! PyArg_ParseTuple( args, "OsiO",
+             &cmesh,
+             &filebase,
+             &num_interiorEdgeTags,
+             &interiorEdgeTags )
+  ) return NULL;
+
+  int failed;
+  int base = 1;
+  failed = readTriangleMesh(MESH(cmesh),filebase,base);
+  constructElementBoundaryElementsArray_triangle(MESH(cmesh));
+  failed = readTriangleElementBoundaryMaterialTypes(MESH(cmesh),filebase,base);
+  failed = mesh_msu_readBC_triangle( MESH(cmesh), 
+                                     filebase, 
+                                     num_interiorEdgeTags, 
+                                     IDATA(interiorEdgeTags) );
+  Py_INCREF(Py_None); 
+  return Py_None;
+}
+
+static PyObject* 
+cmeshTools_read_tetgen( PyObject* self, PyObject* args )
+{
+  PyObject*   cmesh;
+  const char* filebase;
+  if( ! PyArg_ParseTuple( args, "Os",
+              &cmesh,
+              &filebase )
+  ) return NULL;
+
+  int base = 1;
+  int failed;
+  failed = readTetgenMesh(MESH(cmesh),filebase,base);
+  constructElementBoundaryElementsArray_tetrahedron(MESH(cmesh));
+  failed = readTetgenElementBoundaryMaterialTypes(MESH(cmesh),filebase,base);
+  failed = mesh_msu_readBC_tetgen( MESH(cmesh), filebase, base );
+
+  Py_INCREF(Py_None); 
+  return Py_None;
+}
+
+static PyObject* 
+cmeshTools_read_hex( PyObject* self, PyObject* args)
+{
+  PyObject*   cmesh;
+  const char* filebase;
+  int         base;
+  if( ! PyArg_ParseTuple( args, "Osi",
+             &cmesh,
+             &filebase,
+             &base )
+  ) return NULL;
+
+  int failed; 
+  failed = mesh_msu_read_hex(MESH(cmesh),filebase,base);
+  constructElementBoundaryElementsArray_hexahedron(MESH(cmesh));
+  failed = mesh_msu_readBC_hex( MESH(cmesh), filebase, base );
+  Py_INCREF(Py_None); 
+  return Py_None;
+}
+// msu code end
 
 static PyObject* 
 cmeshToolsWriteTriangleFiles(PyObject* self,
@@ -2092,6 +2199,17 @@ static PyMethodDef cmeshToolsMethods[] = {
    cmeshToolsGenerateFromTriangleMesh,       
    METH_VARARGS,                        
    "just convert from triangle mesh directly"},  /*doc string for method*/
+   // msu code start
+   {
+     "read_triangle", cmeshTools_read_triangle, METH_VARARGS, "read triangle mesh"
+   },  
+   {
+     "read_tetgen", cmeshTools_read_tetgen, METH_VARARGS, "read tetgen mesh"
+   },  
+   {
+     "read_hex", cmeshTools_read_hex, METH_VARARGS, "read hex mesh"
+   },  
+   // msu code end
    {"generateFromTriangleFiles",            
    cmeshToolsGenerateFromTriangleFiles,       
    METH_VARARGS,                        

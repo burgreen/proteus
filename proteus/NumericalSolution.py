@@ -32,6 +32,8 @@ from . import Domain
 
 from .Profiling import logEvent
 
+from .msu import MeshFileDomain
+
 # Global to control whether the kernel starting is active.
 embed_ok = True
 
@@ -453,6 +455,129 @@ class NS_base(object):  # (HasTraits):
                 mlMesh.generateFromExistingCoarseMesh(mesh,n.nLevels,
                                                       nLayersOfOverlap=n.nLayersOfOverlapForParallel,
                                                       parallelPartitioningType=n.parallelPartitioningType)
+
+            # msu code start
+            elif isinstance(p.domain,MeshFileDomain.MeshFileDomain): 
+
+                import sys
+
+                logEvent("Reading mesh from file: %s" % p.domain.filename )
+
+                names = p.domain.filename.split('.')
+            
+                if names[1] == 'triangle':
+
+                  mesh = MeshTools.TriangularMesh()
+            
+                  logEvent("Reading mesh from triangle file")
+
+                  mesh.read_triangle( names[0], 
+                                      len(p.domain.interiorEdgeTags), 
+                                      p.domain.interiorEdgeTags ) 
+
+                  p.domain.set_bc_definitions( mesh )
+            
+                  mlMesh = MeshTools.MultilevelTriangularMesh(
+                      0, 0, 0, 
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+            
+            
+                  logEvent("Generating %i-level mesh from coarse Triangle mesh" % (n.nLevels,))
+                  mlMesh.generateFromExistingCoarseMesh( 
+                      mesh,
+                      n.nLevels, 
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                elif names[1] in ['tetgen']:
+
+                  mesh = MeshTools.TetrahedralMesh()
+
+                  nbase = 1
+
+                  if comm.size() == 1:
+                     logEvent("Reading mesh from tetgen file")
+                  if comm.size() > 1:
+                     logEvent("Reading mesh from tetgen file parallel comm.size()=%i" % comm.size())
+
+                  mlMesh = MeshTools.MultilevelTetrahedralMesh(
+                      0, 0, 0,
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                  if comm.size() == 1:
+
+                     mesh.read_tetgen( filebase=names[0] )
+                     p.domain.set_bc_definitions( mesh )
+
+                     logEvent("Generating %i-level mesh from coarse tetgen mesh" % (n.nLevels,))
+
+                     mlMesh.generateFromExistingCoarseMesh(
+                          mesh,
+                          n.nLevels,
+                          nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                          parallelPartitioningType=n.parallelPartitioningType )
+
+                  else: # parallel
+
+                     logEvent("Generating partitioned mesh from tetgen files")
+
+                     mlMesh.generatePartitionedMeshFromTetgenFiles( 
+                          names[0],
+                          nbase,
+                          mesh,
+                          n.nLevels,
+                          nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                          parallelPartitioningType=n.parallelPartitioningType )
+
+                     p.domain.set_bc_definitions( mesh.subdomainMesh )
+
+                elif names[1] in ['hex']:
+
+                  mesh = MeshTools.HexahedralMesh()
+
+                  logEvent("Reading mesh from hex file")
+
+                  mesh.read_hex( filebase=names[0], base=0 )
+
+                  p.domain.print_bc_attrs( mesh )
+                  p.domain.set_bc_definitions( mesh )
+
+                  n.nnx = mesh.hex_nx
+                  n.nny = mesh.hex_ny
+                  n.nnz = mesh.hex_nz
+                  #print 'nx,ny,nz', n.nnx, n.nny, n.nnz
+
+                  mlMesh = MeshTools.MultilevelHexahedralMesh(
+                      0, 0, 0,
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                  logEvent("Generating %i-level mesh from hex tetgen mesh" % (n.nLevels,))
+
+                  mlMesh.generateFromExistingCoarseMesh(
+                       mesh,
+                       n.nLevels,
+                       nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                       parallelPartitioningType=n.parallelPartitioningType )
+
+                  #import pdb; pdb.set_trace()
+                  #print mesh
+                  #ar = Archiver.XdmfArchive('.','out')
+                  #ar.allGather()
+                  #print ar
+                  #mesh.writeMeshXdmf(ar,'zout')
+
+                else:
+
+                  print( names )
+                  raise RuntimeError("file extension not handled")
+            # msu code end
+
             elif isinstance(p.domain,Domain.GMSH_3D_Domain):
                 from subprocess import call
                 import sys

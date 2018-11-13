@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "meshio.h"
 
+#include "msu/mesh_msu.h"
+
 //extern "C"
 //{
 //#include "metis.h"
@@ -4279,6 +4281,10 @@ int partitionNodesFromTetgenFiles(const char* filebase, int indexBase, Mesh& new
   PetscLogStagePop();
   PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
   ierr = enforceMemoryLimit(rank, max_rss_gb,"Done with partitioning!");CHKERRABORT(PROTEUS_COMM_WORLD, ierr);
+  // msu code start
+  //if( g_mesh_msu ) mesh_msu_readBC_tetgen_parallel( *newMesh.subdomainp, filebase, indexBase );
+  mesh_msu_readBC_tetgen_parallel( *newMesh.subdomainp, filebase, indexBase );
+  // msu code end
   return 0;
 }
 
