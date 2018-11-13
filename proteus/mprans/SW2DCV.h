@@ -39,11 +39,11 @@ namespace proteus
     return (ENTROPY(g,h,hu,hv,z,one_over_hReg) + 0.5*g*h*h + g*h*z)*hv*one_over_hReg;
   }
   // FOR ESTIMATING MAX WAVE SPEEDS
-  inline double f(const double& g, const double& h, const double& hZ){
+  inline double fxx(const double& g, const double& h, const double& hZ){
     return ( (h <= hZ) ? 2.*(sqrt(g*h)-sqrt(g*hZ)) : (h-hZ)*sqrt(0.5*g*(h+hZ)/h/hZ) );
   }
   inline double phi(const double& g, const double& h, const double& hL, const double& hR, const double& uL, const double& uR){
-    return ( f(g,h,hL) + f(g,h,hR) + uR - uL );
+    return ( fxx(g,h,hL) + fxx(g,h,hR) + uR - uL );
   }
   inline double fp(const double& g, const double& h, const double& hZ){
     return ( (h <= hZ) ? sqrt(g/h) : g*(2*h*h+h*hZ+hZ*hZ)/(2*sqrt(2*g)*h*h*hZ*sqrt(1/h+1/hZ)) );
