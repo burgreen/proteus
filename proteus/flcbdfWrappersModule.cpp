@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "meshio.h"
 
+#include "msu/mesh_msu.h"
+
 //extern "C"
 //{
 //#include "metis.h"
@@ -2773,7 +2775,16 @@ int enforceMemoryLimit(int rank, double max_rss_gb,const char* msg)
   return 0;
 }
 
-int partitionNodesFromTetgenFiles(const char* filebase, int indexBase, Mesh& newMesh, int nNodes_overlap)
+//#include    "msu/mesh_msu.i"
+
+int partitionNodesFromTetgenFiles 
+// parallel read of tetgen files
+(
+  const char*  filebase, 
+  int          indexBase, 
+  Mesh&        newMesh, 
+  int          nNodes_overlap
+)
 {
   using namespace std;
   PetscErrorCode ierr;
@@ -4269,6 +4280,12 @@ int partitionNodesFromTetgenFiles(const char* filebase, int indexBase, Mesh& new
   PetscLogStagePop();
   PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
   ierr = enforceMemoryLimit(rank, max_rss_gb,"Done with partitioning!");CHKERRABORT(PROTEUS_COMM_WORLD, ierr);
+  mesh_msu_readBC_tetgen_parallel
+  (
+    *newMesh.subdomainp,
+    filebase, 
+    indexBase
+  );
   return 0;
 }
 

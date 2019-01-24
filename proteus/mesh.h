@@ -11,6 +11,8 @@
 /** #include <mach/mach_time.h> */
 #include <cassert>
 #include <cmath>
+
+#include "msu/mesh_msu.h"
 /**
    \file mesh.h
    \defgroup mesh mesh
@@ -82,6 +84,20 @@ extern "C"
       *edgeOffsets_subdomain_owned,
       *edgeNumbering_subdomain2global;
     Mesh* subdomainp;
+
+    // msu data
+
+    int num_attrF;
+    int* attrF;
+    double* nx_mean;
+    double* ny_mean;
+    double* nz_mean;
+    double* nx_stddev;
+    double* ny_stddev;
+    double* nz_stddev;
+    int hex_nx;
+    int hex_ny;
+    int hex_nz;
   };
   
   inline void initializeMesh(Mesh& mesh)

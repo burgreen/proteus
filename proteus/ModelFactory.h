@@ -2,7 +2,10 @@
 #define MODELFACTORY_H
 #include <iostream>
 
+// msu start (uncomment this)
 //#define FULL_BUILD 1
+// msu end
+
 #define NO_INSTANCE std::cout<<"Constructing model object from template class:"<<std::endl \
   <<"return static_cast<Model_Base*>(new ModelTemplate<CompKernelTemplate<" \
   <<nSpaceIn<<","                                                       \

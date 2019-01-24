@@ -505,7 +505,7 @@ class Newton(NonlinearSolver):
         self.linearSolverFailed = False
         while (not self.converged(r) and
                not self.failed()):
-            logEvent("  NumericalAnalytics NewtonIteration: %d, NewtonNorm: %12.5e"
+            logEvent("  NumericalAnalytics NewtonIteration1: %d, NewtonNorm: %12.5e"
                 %(self.its-1, self.norm_r), level=1)
             logEvent("   Newton it %d norm(r) = %12.5e  \t\t norm(r)/(rtol*norm(r0)+atol) = %g test=%s"
                 % (self.its-1,self.norm_r,(self.norm_r/(self.rtol_r*self.norm_r0+self.atol_r)),self.convergenceTest),level=1)
@@ -664,13 +664,13 @@ class Newton(NonlinearSolver):
                     Viewers.newPlot()
                     Viewers.newWindow()
                 #raw_input("wait")
-            logEvent("  NumericalAnalytics NewtonIteration: %d, NewtonNorm: %12.5e"
+            logEvent("  NumericalAnalytics NewtonIteration2: %d, NewtonNorm: %12.5e"
                 %(self.its-1, self.norm_r), level=1)
             logEvent("   Newton it %d norm(r) = %12.5e  \t\t norm(r)/(rtol*norm(r0)+atol) = %12.5e"
                 % (self.its,self.norm_r,(self.norm_r/(self.rtol_r*self.norm_r0+self.atol_r))),level=1)
             logEvent(memory("Newton","Newton"),level=4)
             return self.failedFlag
-        logEvent("  NumericalAnalytics NewtonIteration: %d, NewtonNorm: %12.5e"
+        logEvent("  NumericalAnalytics NewtonIteration3: %d, NewtonNorm: %12.5e"
             %(self.its-1, self.norm_r), level=1)
         logEvent("   Newton it %d norm(r) = %12.5e  \t\t norm(r)/(rtol*norm(r0)+atol) = %12.5e"
             % (self.its,self.norm_r,(self.norm_r/(self.rtol_r*self.norm_r0+self.atol_r))),level=1)
@@ -3341,9 +3341,9 @@ def multilevelNonlinearSolverChooser(nonlinearOperatorList,
     if (levelNonlinearSolverType == TwoStageNewton):
         levelNonlinearSolverType = TwoStageNewton
     elif (levelNonlinearSolverType == ExplicitLumpedMassMatrixShallowWaterEquationsSolver):
-        levelNonlinearSolverType = ExplicitLumpedMassMatrixShallowWaterEquationsSolver
+          levelNonlinearSolverType =  ExplicitLumpedMassMatrixShallowWaterEquationsSolver
     elif (levelNonlinearSolverType == ExplicitConsistentMassMatrixShallowWaterEquationsSolver):
-        levelNonlinearSolverType = ExplicitConsistentMassMatrixShallowWaterEquationsSolver
+          levelNonlinearSolverType =  ExplicitConsistentMassMatrixShallowWaterEquationsSolver
     elif (levelNonlinearSolverType == ExplicitLumpedMassMatrix):
         levelNonlinearSolverType = ExplicitLumpedMassMatrix
     elif (levelNonlinearSolverType == ExplicitConsistentMassMatrixWithRedistancing):

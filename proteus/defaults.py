@@ -137,6 +137,7 @@ def reset_default_n():
 def load_numerics(nModule, path='.'):
     reset_default_n()
     sys.path.append(path)
+    print '+++++', nModule
     n = imp.load_source(nModule, os.path.join(path, nModule+".py"))
     sys.path.remove(path)
     numerics_object = Numerics_base()

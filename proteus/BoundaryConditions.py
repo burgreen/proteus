@@ -21,7 +21,7 @@ class BC_Base():
         else:
             assert nd is not None, 'Shape or nd must be passed to BC'
         if b_or is not None:
-            self._b_or = b_or[b_i]  # array of orientation of all boundaries of shape
+            self._b_or = b_or[int(b_i)]  # array of orientation of all boundaries of shape
         else:
             self._b_or = None
 
@@ -52,6 +52,9 @@ class BC_Base():
             self.ct = Context.get()
         else:
             self.ct = context
+
+    def set_b_or(self, b_or):
+        self._b_or = b_or
 
 
 class BoundaryCondition():

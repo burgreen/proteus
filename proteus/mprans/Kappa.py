@@ -151,7 +151,10 @@ independently and lagged in time
                  nu_0=1.004e-6,
                  rho_1=1.205,
                  nu_1=1.500e-5,
-                 g=[0.0, -9.8],
+                 # msu-turb start
+                 #g=[0.0, -9.8],
+                 g=numpy.array([0,0,0], dtype='d'),
+                 # msu-turb end
                  nd=3,
                  epsFact=0.01,
                  useMetrics=0.0,
@@ -273,6 +276,12 @@ independently and lagged in time
                 self.ebq_phi = modelList[self.LS_modelIndex].ebq[('u', 0)]
             else:
                 self.ebq_phi = None
+        # msu-turb start
+        else:
+            self.q_phi = None
+            self.ebq_phi = None
+            self.ebqe_phi = None
+        # msu-turb end
         # flow model
         assert self.flowModelIndex is not None, "Kappa: invalid index for flow model allowed range: [0,%s]" % len(modelList)
         # print "flow model index------------",self.flowModelIndex,modelList[self.flowModelIndex].q.has_key(('velocity',0))
@@ -564,6 +573,7 @@ class LevelModel(proteus.Transport.OneLevelTransport):
         self.dirichletNodeSetList = None  # explicit Dirichlet  conditions for now, no Dirichlet BC constraints
         self.coefficients = coefficients
         self.coefficients.initializeMesh(self.mesh)
+        print( "msu-coeff.g = ", self.coefficients.g )
         self.nc = self.coefficients.nc
         self.stabilization = stabilization
         self.shockCapturing = shockCapturing
@@ -950,7 +960,6 @@ class LevelModel(proteus.Transport.OneLevelTransport):
         """
         Calculate the element residuals and add in to the global residual
         """
-
         r.fill(0.0)
         # Load the unknowns into the finite element dof
         self.timeIntegration.calculateCoefs()

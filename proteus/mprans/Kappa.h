@@ -405,8 +405,11 @@ namespace proteus
           f[I] = v[I]*k*porosity;
           df[I] = v[I]*porosity;
         }
-      const double H_mu = smoothedHeaviside(eps_mu,phi);
-      double nu = (1.0-H_mu)*nu_0 + H_mu*nu_1;
+// msu-turb start
+      //const double H_mu = smoothedHeaviside(eps_mu,phi);
+      //double nu = (1.0-H_mu)*nu_0 + H_mu*nu_1;
+      double nu = nu_0;
+// msu-turb end
       const double div_eps = 1.0e-2*fmin(nu_0,nu_1);
       //eddy viscosity
       nu_t     = isKEpsilon*c_mu*k_old*k_old/(fabs(dissipation)+div_eps)
@@ -1022,7 +1025,7 @@ namespace proteus
               //
               evaluateCoefficients(&velocity[eN_k_nSpace],
                                    epsFact,
-                                   phi_ls[eN_k],
+                                   1.0, // msu-turb phi_ls[eN_k],
                                    nu_0,
                                    nu_1,
                                    sigma_k,
@@ -1273,7 +1276,7 @@ namespace proteus
               //
               evaluateCoefficients(&ebqe_velocity_ext[ebNE_kb_nSpace],
                                    epsFact,
-                                   ebqe_phi[ebNE_kb],
+                                   1.0, // msu-turb ebqe_phi[ebNE_kb],
                                    nu_0,
                                    nu_1,
                                    sigma_k,
@@ -1307,7 +1310,7 @@ namespace proteus
                                    dr_ext);
               evaluateCoefficients(&ebqe_velocity_ext[ebNE_kb_nSpace],
                                    epsFact,
-                                   ebqe_phi[ebNE_kb],
+                                   1.0, // msu-turb ebqe_phi[ebNE_kb],
                                    nu_0,
                                    nu_1,
                                    sigma_k,
@@ -1590,7 +1593,7 @@ namespace proteus
               //
               evaluateCoefficients(&velocity[eN_k_nSpace],
                                    epsFact,
-                                   phi_ls[eN_k],
+                                   1.0, // msu-turb phi_ls[eN_k],
                                    nu_0,
                                    nu_1,
                                    sigma_k,
@@ -1850,7 +1853,7 @@ namespace proteus
               //
               evaluateCoefficients(&ebqe_velocity_ext[ebNE_kb_nSpace],
                                    epsFact,
-                                   ebqe_phi[ebNE_kb],
+                                   1.0, // msu-turb ebqe_phi[ebNE_kb],
                                    nu_0,
                                    nu_1,
                                    sigma_k,
@@ -1884,7 +1887,7 @@ namespace proteus
                                    dr_ext);
               evaluateCoefficients(&ebqe_velocity_ext[ebNE_kb_nSpace],
                                    epsFact,
-                                   ebqe_phi[ebNE_kb],
+                                   1.0, // msu-turb ebqe_phi[ebNE_kb],
                                    nu_0,
                                    nu_1,
                                    sigma_k,

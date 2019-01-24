@@ -9,6 +9,7 @@ import sys
 import numpy as np
 from proteus.Profiling import logEvent
 from proteus import MeshTools
+from proteus.mprans import BoundaryConditions as bc
 
 class D_base:
     """

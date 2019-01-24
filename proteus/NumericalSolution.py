@@ -6,6 +6,7 @@ A hierarchy of classes for managing complete numerical solution implementations
 """
 
 import os
+import sys
 import numpy
 from subprocess import check_call
 
@@ -13,6 +14,7 @@ import LinearSolvers
 import NonlinearSolvers
 import TriangleTools
 import MeshTools
+
 import Profiling
 import Transport
 import SimTools
@@ -22,6 +24,8 @@ from Archiver import ArchiveFlags
 import Domain
 
 from .Profiling import logEvent
+
+from .msu import MeshFileDomain
 
 # Global to control whether the kernel starting is active.
 embed_ok = True
@@ -439,6 +443,137 @@ class NS_base:  # (HasTraits):
                 mlMesh.generateFromExistingCoarseMesh(mesh,n.nLevels,
                                                       nLayersOfOverlap=n.nLayersOfOverlapForParallel,
                                                       parallelPartitioningType=n.parallelPartitioningType)
+
+            elif isinstance(p.domain,MeshFileDomain.MeshFileDomain): # msu
+
+                import sys
+
+                logEvent("Reading mesh from file: %s" % p.domain.filename )
+
+                names = p.domain.filename.split('.')
+            
+                if names[1] == 'triangle':
+
+                  mesh = MeshTools.TriangularMesh()
+            
+                  logEvent("Reading mesh from triangle file")
+
+                  mesh.read_triangle( names[0], 
+                                      len(p.domain.interiorEdgeTags), 
+                                      p.domain.interiorEdgeTags ) 
+
+                  p.domain.set_bc_definitions( mesh )
+            
+                  mlMesh = MeshTools.MultilevelTriangularMesh(
+                      0, 0, 0, 
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+            
+            
+                  logEvent("Generating %i-level mesh from coarse Triangle mesh" % (n.nLevels,))
+                  mlMesh.generateFromExistingCoarseMesh( 
+                      mesh,
+                      n.nLevels, 
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                elif names[1] in ['tetgen']:
+
+                  mesh = MeshTools.TetrahedralMesh()
+
+                  nbase = 1
+
+                  if comm.size() == 1:
+                     logEvent("Reading mesh from tetgen file")
+                  if comm.size() > 1:
+                     logEvent("Reading mesh from tetgen file parallel comm.size()=%i" % comm.size())
+
+                  mlMesh = MeshTools.MultilevelTetrahedralMesh(
+                      0, 0, 0,
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                  if comm.size() == 1:
+
+                     mesh.read_tetgen( filebase=names[0] )
+                     p.domain.set_bc_definitions( mesh )
+
+                     logEvent("Generating %i-level mesh from coarse tetgen mesh" % (n.nLevels,))
+
+                     mlMesh.generateFromExistingCoarseMesh(
+                          mesh,
+                          n.nLevels,
+                          nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                          parallelPartitioningType=n.parallelPartitioningType )
+
+                  else: # parallel
+
+                     logEvent("Generating partitioned mesh from tetgen files")
+
+                     mlMesh.generatePartitionedMeshFromTetgenFiles( 
+                          names[0],
+                          nbase,
+                          mesh,
+                          n.nLevels,
+                          nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                          parallelPartitioningType=n.parallelPartitioningType )
+
+                     p.domain.set_bc_definitions( mesh.subdomainMesh )
+
+                     #exF = mesh.subdomainMesh.nExteriorElementBoundaries_global
+                     #inF = mesh.subdomainMesh.nInteriorElementBoundaries_global
+                     #print comm.rank(),exF,inF,exF+inF
+                     #if comm.rank() == 1: print dir(mesh.subdomainMesh)
+                     #if comm.rank() == 1: print (mesh.nodeDict)
+                     #if comm.rank() == 1: print len(mesh.subdomainMesh.oldToNewNode)
+                     #if comm.rank() == 1: print len(mesh.subdomainMesh.oldToNewNode)
+                     #print 'comm.size()', comm.size()
+                     #sys.exit();
+
+                elif names[1] in ['hex']:
+
+                  mesh = MeshTools.HexahedralMesh()
+
+                  logEvent("Reading mesh from hex file")
+
+                  mesh.read_hex( filebase=names[0], base=0 )
+
+                  p.domain.print_bc_attrs( mesh )
+                  p.domain.set_bc_definitions( mesh )
+
+                  n.nnx = mesh.hex_nx
+                  n.nny = mesh.hex_ny
+                  n.nnz = mesh.hex_nz
+                  print 'nx,ny,nz', n.nnx, n.nny, n.nnz
+
+                  mlMesh = MeshTools.MultilevelHexahedralMesh(
+                      0, 0, 0,
+                      skipInit=True,
+                      nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                      parallelPartitioningType=n.parallelPartitioningType )
+
+                  logEvent("Generating %i-level mesh from hex tetgen mesh" % (n.nLevels,))
+
+                  mlMesh.generateFromExistingCoarseMesh(
+                       mesh,
+                       n.nLevels,
+                       nLayersOfOverlap=n.nLayersOfOverlapForParallel,
+                       parallelPartitioningType=n.parallelPartitioningType )
+
+                  #import pdb; pdb.set_trace()
+                  print mesh
+                  ar = Archiver.XdmfArchive('.','out')
+                  ar.allGather()
+                  print ar
+                  mesh.writeMeshXdmf(ar,'zout')
+
+                else:
+
+                  print( names )
+                  raise RuntimeError("file extension not handled")
+
             elif isinstance(p.domain,Domain.GMSH_3D_Domain):
                 from subprocess import call
                 import sys
@@ -894,7 +1029,7 @@ class NS_base:  # (HasTraits):
             m.stepController.substeps = mOld.stepController.substeps
         # logEvent("Evaluating residuals and time integration")
         for m,ptmp,mOld in zip(self.modelList, self.pList, modelListOld):
-            logEvent("Attaching models to model "+ptmp.name)
+            logEvent("Attaching_1 models to model "+ptmp.name)
             m.attachModels(self.modelList)
         logEvent("Evaluating residuals and time integration")
         for m,ptmp,mOld in zip(self.modelList, self.pList, modelListOld):
@@ -1294,19 +1429,22 @@ class NS_base:  # (HasTraits):
             for index,m in self.modelSpinUp.iteritems():
                 spinup.append((self.pList[index],self.nList[index],m,self.simOutputList[index]))
         for index,m in enumerate(self.modelList):
-            logEvent("Attaching models to model "+m.name)
+            logEvent("Attaching_2 models to model "+m.name)
             m.attachModels(self.modelList)
             if index not in self.modelSpinUp:
                 spinup.append((self.pList[index],self.nList[index],m,self.simOutputList[index]))
+        logEvent("Done Attaching_2 models to model ")
         for m in self.modelList:
+            logEvent("GetResidual in model "+m.name)
             for lm,lu,lr in zip(m.levelModelList,
                                 m.uList,
                                 m.rList):
                 #calculate the coefficients, any explicit-in-time
                 #terms will be wrong
                 lm.getResidual(lu,lr)
+        logEvent("Done Getting residuals to models")
         for p,n,m,simOutput in spinup:
-            logEvent("Attaching models to model "+p.name)
+            logEvent("Attaching_3 models to model "+p.name)
             m.attachModels(self.modelList)
             if m in self.modelSpinUp.values():
                 logEvent("Spin-Up Estimating initial time derivative and initializing time history for model "+p.name)

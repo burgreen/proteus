@@ -2001,7 +2001,7 @@ namespace proteus
 		      flux_ext = ebqe_bc_flux_u_ext[ebNE_kb];
 		    else
 		      {
-			std::cout<<"warning: VOF open boundary with no external trace, setting to zero for inflow"<<std::endl;
+			std::cout<<"warning: VOF Open boundary with no external trace, setting to zero for inflow"<<std::endl;
 			flux_ext = 0.0;
 		      }
 		  }
