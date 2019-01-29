@@ -92,7 +92,8 @@ class AR_base:
                                   "a")
             if self.has_h5py and not useTextArchive:
                 self.hdfFilename=filename+".h5"
-                self.hdfFile=h5py.File(self.hdfFilename,
+                # msu-fix self.hdfFile=h5py.File(self.hdfFilename,
+                self.hdfFile=h5py.File( os.path.join(self.dataDir,filename+".h5"),
                                        "a",
                                        driver="mpio",
                                        comm = comm_world)

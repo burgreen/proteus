@@ -1389,6 +1389,7 @@ class NS_base:  # (HasTraits):
                     logEvent("Not enough steps in hot start file set set dt, setting dt to 1.0")
                     dt = 1.0
                 logEvent("Hot starting from time step t = "+`time`)
+                logEvent("msu Hot starting from time step size dt = "+`dt`)
                 for lm,lu,lr in zip(m.levelModelList,m.uList,m.rList):
                     for cj in range(lm.coefficients.nc):
                         lm.u[cj].femSpace.readFunctionXdmf(self.ar[index],lm.u[cj],tCount)
