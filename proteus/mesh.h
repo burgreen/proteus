@@ -174,6 +174,19 @@ extern "C"
     mesh.edgeNumbering_subdomain2global=NULL;
     mesh.subdomainp=NULL;
 
+    // msu data
+    mesh.num_attrF=0;
+    mesh.attrF=NULL;
+    mesh.nx_mean=NULL;
+    mesh.ny_mean=NULL;
+    mesh.nz_mean=NULL;
+    mesh.nx_stddev=NULL;
+    mesh.ny_stddev=NULL;
+    mesh.nz_stddev=NULL;
+    mesh.hex_nx=0;
+    mesh.hex_ny=0;
+    mesh.hex_nz=0;
+
   }
 
   inline void deleteMesh(Mesh& mesh)
@@ -267,6 +280,19 @@ extern "C"
     mesh.edgeNumbering_subdomain2global=NULL;
     mesh.subdomainp=NULL;
     
+    // msu data
+    mesh.num_attrF=0;
+    mesh.attrF=NULL;
+    mesh.nx_mean=NULL;
+    mesh.ny_mean=NULL;
+    mesh.nz_mean=NULL;
+    mesh.nx_stddev=NULL;
+    mesh.ny_stddev=NULL;
+    mesh.nz_stddev=NULL;
+    mesh.hex_nx=0;
+    mesh.hex_ny=0;
+    mesh.hex_nz=0;
+
   }
   
   struct MultilevelMesh

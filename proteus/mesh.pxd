@@ -53,7 +53,7 @@ cdef extern from "mesh.h":
       int *edgeNumbering_subdomain2global
       Mesh* subdomainp
 
-      // msu data
+      # msu data
       int     num_attrF;
       int*    attrF;
       double* nx_mean;

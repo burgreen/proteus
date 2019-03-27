@@ -89,7 +89,7 @@ cdef class CMesh:
         cdef double sigmaMax,
         cdef double volume,
 
-        // msu data
+        # msu data
         cdef int         num_attrF,
         cdef np.ndarray  attrF,
         cdef np.ndarray  nx_mean,
