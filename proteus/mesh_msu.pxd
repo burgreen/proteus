@@ -4,28 +4,26 @@ cimport mesh as cppm
 
 cdef extern from "msu/mesh_msu.h":
 
-  cdef cppm.Mesh Mesh
+  cdef int  mesh_msu_readBC( cppm.Mesh& mesh, const char* filebase, int indexBase );
 
-  cdef int  mesh_msu_readBC( Mesh& mesh, const char* filebase, int indexBase );
-
-  cdef int  mesh_msu_readBC_tetgen( Mesh&       mesh, 
+  cdef int  mesh_msu_readBC_tetgen( cppm.Mesh&  mesh, 
                                     const char* filebase, 
                                     int         indexBase );
   
-  cdef int  mesh_msu_readBC_tetgen_parallel( Mesh&       mesh, 
+  cdef int  mesh_msu_readBC_tetgen_parallel( cppm.Mesh&  mesh, 
                                              const char* filebase, 
                                              int         indexBase );
   
-  cdef int  mesh_msu_readBC_triangle( Mesh&       mesh, 
+  cdef int  mesh_msu_readBC_triangle( cppm.Mesh&  mesh, 
                                       const char* filebase, 
                                       int         num_interiorEdgeTags, 
                                       int*        interiorEdgeTags );
 
-  cdef int  mesh_msu_readBC_hex( Mesh&       mesh, 
+  cdef int  mesh_msu_readBC_hex( cppm.Mesh&  mesh, 
                                  const char* filebase, 
                                  int         indexBase );
 
-  cdef int  mesh_msu_read_hex( Mesh&       mesh, 
+  cdef int  mesh_msu_read_hex( cppm.Mesh&  mesh, 
                                const char* filebase, 
                                int         indexBase );
   
