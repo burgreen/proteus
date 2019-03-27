@@ -81,8 +81,8 @@ cdef class CMesh:
             self.W_KNOT = np.asarray(<double[:self.mesh.nz+self.mesh.pz+1]> self.mesh.W_KNOT)
         else:
             self.W_KNOT = np.empty(0)
-        self.elementDiametersArray = np.asarray(<double[:self.mesh.nElements_global]> self.mesh.elementDiametersArray)
-        self.elementInnerDiametersArray = np.asarray(<double[:self.mesh.nElements_global]> self.mesh.elementInnerDiametersArray)
+        self.elementDiametersArray         = np.asarray(<double[:self.mesh.nElements_global]> self.mesh.elementDiametersArray)
+        self.elementInnerDiametersArray    = np.asarray(<double[:self.mesh.nElements_global]> self.mesh.elementInnerDiametersArray)
         self.elementBoundaryDiametersArray = np.asarray(<double[:self.mesh.nElementBoundaries_global]> self.mesh.elementBoundaryDiametersArray)
         if self.mesh.elementBarycentersArray:
             self.elementBarycentersArray = np.asarray(<double[:self.mesh.nElements_global, :3]> self.mesh.elementBarycentersArray)
@@ -98,19 +98,19 @@ cdef class CMesh:
         self.volume = self.mesh.volume
         # msu data
         self.num_attrF = self.mesh.num_attrF
-        if self.attrF: 
+        if self.mesh.attrF != NULL: 
            self.attrF     = np.asarray( <int[:self.num_attrF]> self.mesh.attrF )
-        if self.nx_mean: 
+        if self.mesh.nx_mean != NULL: 
            self.nx_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.nx_mean )
-        if self.ny_mean: 
+        if self.mesh.ny_mean != NULL: 
            self.ny_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.ny_mean )
-        if self.nz_mean: 
+        if self.mesh.nz_mean != NULL: 
            self.nz_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.nz_mean )
-        if self.nx_stddev: 
+        if self.mesh.nx_stddev != NULL: 
            self.nx_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.nx_stddev )
-        if self.ny_stddev: 
+        if self.mesh.ny_stddev != NULL: 
            self.ny_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.ny_stddev )
-        if self.nz_stddev: 
+        if self.mesh.nz_stddev != NULL: 
            self.nz_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.nz_stddev )
         self.hex_nx    = self.mesh.hex_nx
         self.hex_ny    = self.mesh.hex_ny
@@ -385,6 +385,8 @@ cpdef void read_tetgen( CMesh    cmesh,
     cppm.constructElementBoundaryElementsArray_tetrahedron(cmesh.mesh)
     failed = cppm.readTetgenElementBoundaryMaterialTypes(cmesh.mesh,filebase.encode('utf8'),base)
     failed = cppm_msu.mesh_msu_readBC_tetgen( cmesh.mesh, filebase.encode('utf8'), base )
+    cppm.allocateGeometricInfo_tetrahedron( cmesh.mesh )
+    cppm.computeGeometricInfo_tetrahedron( cmesh.mesh )
 
 cpdef void read_hex( CMesh    cmesh,
                      unicode  filebase,

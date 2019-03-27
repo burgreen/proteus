@@ -281,6 +281,13 @@ extern "C"
     mesh.subdomainp=NULL;
     
     // msu data
+    if( mesh.attrF     != NULL ) delete [] mesh.attrF;     
+    if( mesh.nx_mean   != NULL ) delete [] mesh.nx_mean;     
+    if( mesh.ny_mean   != NULL ) delete [] mesh.ny_mean;     
+    if( mesh.nz_mean   != NULL ) delete [] mesh.nz_mean;     
+    if( mesh.nx_stddev != NULL ) delete [] mesh.nx_stddev;     
+    if( mesh.ny_stddev != NULL ) delete [] mesh.ny_stddev;     
+    if( mesh.nz_stddev != NULL ) delete [] mesh.nz_stddev;     
     mesh.num_attrF=0;
     mesh.attrF=NULL;
     mesh.nx_mean=NULL;

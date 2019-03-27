@@ -191,7 +191,7 @@ static int s_interior_bc = 0; // hardwire
     nz[bc].push_back( normal[2] );
   }
 
-  std::cout << "numF_assigned = " << numF_assigned << std::endl;
+  std::cout << "serial numF_assigned = " << numF_assigned << std::endl;
 
   // compute mean and stddev of bc zone face normals
 
@@ -210,6 +210,7 @@ static int s_interior_bc = 0; // hardwire
   for( I = attrF.begin(); I != attrF.end(); ++I )
   {
     int a = *I;
+    //std::cout << "attrF = " << a << std::endl;
 
     double nx_mean=0, nx_stddev=0;
     double ny_mean=0, ny_stddev=0;
@@ -354,7 +355,7 @@ static int s_interior_bc = 0; // hardwire
     }
   }
 
-  std::cout << "numF_assigned = " << numF_assigned << std::endl;
+  std::cout << "parallel numF_assigned = " << numF_assigned << std::endl;
   std::map<int,int> mapIC; // idx-count
   int nbF = mesh.nExteriorElementBoundaries_global;
   FOR( f, nbF )
