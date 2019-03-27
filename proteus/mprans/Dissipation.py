@@ -161,7 +161,10 @@ class Coefficients(proteus.TransportCoefficients.TC_base):
                  nu_0=1.004e-6,
                  rho_1=1.205,
                  nu_1=1.500e-5,
-                 g=[0.0, -9.8],
+                 # msu-turb start
+                 #g=[0.0, -9.8],
+                 g=numpy.array([0,0,0], dtype='d'),
+                 # msu-turb end
                  nd=3,
                  epsFact=0.01,
                  useMetrics=0.0,
@@ -289,6 +292,12 @@ class Coefficients(proteus.TransportCoefficients.TC_base):
                 self.ebq_phi = modelList[self.LS_modelIndex].ebq[('u', 0)]
             else:
                 self.ebq_phi = None
+        # msu-turb start
+        else:
+            self.q_phi = None
+            self.ebq_phi = None
+            self.ebqe_phi = None
+        # msu-turb end
         # flow model
         self.u_old_dof = numpy.copy(self.model.u[0].dof)
 

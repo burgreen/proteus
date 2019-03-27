@@ -6,6 +6,7 @@ cimport numpy as np
 from libcpp cimport bool
 from mpi4py import MPI
 cimport mesh as cppm
+cimport mesh_msu as cppm_msu
 from proteus import Comm
 
 cdef class CMesh:
@@ -95,7 +96,26 @@ cdef class CMesh:
         self.hMin = self.mesh.hMin
         self.sigmaMax = self.mesh.sigmaMax
         self.volume = self.mesh.volume
-    
+        # msu data
+        self.num_attrF = self.mesh.num_attrF
+        if self.attrF: 
+           self.attrF     = np.asarray( <int[:self.num_attrF]> self.mesh.attrF )
+        if self.nx_mean: 
+           self.nx_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.nx_mean )
+        if self.ny_mean: 
+           self.ny_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.ny_mean )
+        if self.nz_mean: 
+           self.nz_mean   = np.asarray( <double[:self.num_attrF]> self.mesh.nz_mean )
+        if self.nx_stddev: 
+           self.nx_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.nx_stddev )
+        if self.ny_stddev: 
+           self.ny_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.ny_stddev )
+        if self.nz_stddev: 
+           self.nz_stddev = np.asarray( <double[:self.num_attrF]> self.mesh.nz_stddev )
+        self.hex_nx    = self.mesh.hex_nx
+        self.hex_ny    = self.mesh.hex_ny
+        self.hex_nz    = self.mesh.hex_nz 
+
     def buildPythonMeshInterfaceNoArrays(self):
         cdef int dim1
         self.nElements_global = self.mesh.nElements_global
@@ -168,7 +188,19 @@ def buildPythonMeshInterface(cmesh):
             cmesh.h,
             cmesh.hMin,
             cmesh.sigmaMax,
-            cmesh.volume)
+            cmesh.volume,
+            # msu data
+            cmesh.num_attrF,
+            cmesh.attrF,
+            cmesh.nx_mean,
+            cmesh.ny_mean,
+            cmesh.nz_mean,
+            cmesh.nx_stddev,
+            cmesh.ny_stddev,
+            cmesh.nz_stddev,
+            cmesh.hex_nx,
+            cmesh.hex_ny,
+            cmesh.hex_nz )
 
 def buildPythonMeshInterfaceNoArrays(cmesh):
     """
@@ -328,6 +360,46 @@ cpdef void generateFromTriangleFiles(CMesh cmesh,
     failed = cppm.readTriangleMesh(cmesh.mesh,filebase.encode('utf8'),base);
     cppm.constructElementBoundaryElementsArray_triangle(cmesh.mesh);
     failed = cppm.readTriangleElementBoundaryMaterialTypes(cmesh.mesh,filebase.encode('utf8'),base);
+
+# start msu
+
+cpdef void read_triangle( CMesh       cmesh,
+                          unicode     filebase,
+                          int         num_interiorEdgeTags,
+                          np.ndarray  interiorEdgeTags ):
+    cdef int failed
+    cdef int base = 1
+    failed = cppm.readTriangleMesh(cmesh.mesh,filebase.encode('utf8'),base)
+    cppm.constructElementBoundaryElementsArray_triangle(cmesh.mesh)
+    failed = cppm.readTriangleElementBoundaryMaterialTypes(cmesh.mesh,filebase.encode('utf8'),base)
+    failed = cppm_msu.mesh_msu_readBC_triangle( cmesh.mesh, 
+                                                filebase.encode('utf8'), 
+                                                num_interiorEdgeTags, 
+                                                <int*>(interiorEdgeTags.data) )
+
+cpdef void read_tetgen( CMesh    cmesh,
+                        unicode  filebase ):
+    cdef int failed
+    cdef int base = 1
+    failed = cppm.readTetgenMesh(cmesh.mesh,filebase.encode('utf8'),base)
+    cppm.constructElementBoundaryElementsArray_tetrahedron(cmesh.mesh)
+    failed = cppm.readTetgenElementBoundaryMaterialTypes(cmesh.mesh,filebase.encode('utf8'),base)
+    failed = cppm_msu.mesh_msu_readBC_tetgen( cmesh.mesh, filebase.encode('utf8'), base )
+
+cpdef void read_hex( CMesh    cmesh,
+                     unicode  filebase,
+                     int      base ):
+    cdef int failed
+    failed = cppm.readTetgenMesh(cmesh.mesh,filebase.encode('utf8'),base)
+    cppm.constructElementBoundaryElementsArray_tetrahedron(cmesh.mesh)
+    failed = cppm.readTetgenElementBoundaryMaterialTypes(cmesh.mesh,filebase.encode('utf8'),base)
+    failed = cppm_msu.mesh_msu_readBC_tetgen( cmesh.mesh, filebase.encode('utf8'), base )
+
+    failed = cppm_msu.mesh_msu_read_hex(cmesh.mesh,filebase.encode('utf8'),base);
+    cppm.constructElementBoundaryElementsArray_hexahedron(cmesh.mesh);
+    failed = cppm_msu.mesh_msu_readBC_hex( cmesh.mesh, filebase.encode('utf8'), base );
+
+# end msu
 
 cpdef void writeTriangleFiles(CMesh cmesh,
                              unicode filebase,

@@ -1,4 +1,6 @@
 #include "mesh.h"
+#include "msu/mesh_msu.h"
+
 #define DEBUG_REFINE
 /**
    \ingroup mesh mesh

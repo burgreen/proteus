@@ -580,6 +580,18 @@ class Mesh(object):
         self.arGrid=None
         self.nLayersOfOverlap = None
         self.parallelPartitioningType = MeshParallelPartitioningTypes.element
+        # msu data
+        self.num_attrF=None
+        self.attrF=None
+        self.nx_mean=None
+        self.ny_mean=None
+        self.nz_mean=None
+        self.nx_stddev=None
+        self.ny_stddev=None
+        self.nz_stddev=None
+        self.hex_nx=None
+        self.hex_ny=None
+        self.hex_nz=None
     def partitionMesh(self,nLayersOfOverlap=1,parallelPartitioningType=MeshParallelPartitioningTypes.node):
         from . import cmeshTools
         from . import Comm
@@ -1056,7 +1068,19 @@ class Mesh(object):
          self.h,
          self.hMin,
          self.sigmaMax,
-         self.volume) = cmeshTools.buildPythonMeshInterface(self.cmesh)
+         self.volume,
+         # msu data
+         self.num_attrF,
+         self.attrF,
+         self.nx_mean,
+         self.ny_mean,
+         self.nz_mean,
+         self.nx_stddev,
+         self.ny_stddev,
+         self.nz_stddev,
+         self.hex_nx,
+         self.hex_ny,
+         self.hex_nz ) = cmeshTools.buildPythonMeshInterface(self.cmesh)
         # print("from C")
         # print  (self.nElements_global,
         #  self.nNodes_global,
@@ -2817,6 +2841,25 @@ class TetrahedralMesh(Mesh):
     def refine(self,oldMesh):
         return self.refineFreudenthalBey(oldMesh)
 
+    # msu start
+    def read_tetgen( self, filebase, skipGeometricInit=True, parallel=False ):
+        import cmeshTools
+        logEvent(memory("declaring CMesh"),level=4)
+        self.cmesh = cmeshTools.CMesh()
+        logEvent(memory("Initializing CMesh"),level=4)
+        if parallel:
+            raise RuntimeError("todo")
+            #cmeshTools.read_parallel_tetgen(self.cmesh,filebase)
+        else:
+            cmeshTools.read_tetgen(self.cmesh,filebase)
+        logEvent(memory("calling cmeshTools.generateFromTetgenFiles","cmeshTools"),level=4)
+        if skipGeometricInit == False:
+            cmeshTools.allocateGeometricInfo_tetrahedron(self.cmesh)
+            cmeshTools.computeGeometricInfo_tetrahedron(self.cmesh)
+        self.buildFromC(self.cmesh)
+        logEvent(memory("calling buildFromC"),level=4)
+    # msu end
+
     def generateFromTetgenFiles(self,filebase,base,skipGeometricInit=False,parallel=False):
         from . import cmeshTools
         logEvent(memory("declaring CMesh"),level=4)
@@ -3049,6 +3092,16 @@ min(h_k)             : %d\n""" % (self.nElements_global,
         cmeshTools.allocateGeometricInfo_hexahedron(self.cmesh)
         cmeshTools.computeGeometricInfo_hexahedron(self.cmesh)
         self.buildFromC(self.cmesh)
+
+    # msu start
+    def read_hex( self, filebase, base=0 ):
+        import cmeshTools
+        self.cmesh = cmeshTools.CMesh()
+        cmeshTools.read_hex(self.cmesh,filebase,base)
+        cmeshTools.allocateGeometricInfo_hexahedron(self.cmesh)
+        cmeshTools.computeGeometricInfo_hexahedron(self.cmesh)
+        self.buildFromC(self.cmesh)
+    # msu end
 
 class Mesh2DM(Mesh):
     """A triangular mesh based on an ADH 3dm file"""
@@ -4046,25 +4099,34 @@ class TriangularMesh(Mesh):
         #self.buildListsTriangles()
     #mwf debug switch to redblac
     rectangularToTriangular = rectangularToTriangularOrientedOtherWay#rectangularToTriangularOriented
+    # msu start
+    def read_triangle( self, ctrirep, num_interiorTags, interiorTags ):
+        from . import cmeshTools
+        self.cmesh = cmeshTools.CMesh()
+        cmeshTools.read_triangle( self.cmesh, ctrirep, num_interiorTags, interiorTags )
+        cmeshTools.allocateGeometricInfo_triangle(self.cmesh)
+        cmeshTools.computeGeometricInfo_triangle(self.cmesh)
+        self.buildFromC(self.cmesh)
+    # msu end
     def generateFromTriangleMesh(self,ctrirep,base):
-        from .import cmeshTools
+        from . import cmeshTools
         self.cmesh = cmeshTools.CMesh()
         cmeshTools.generateFromTriangleMesh(self.cmesh,ctrirep,base)
         cmeshTools.allocateGeometricInfo_triangle(self.cmesh)
         cmeshTools.computeGeometricInfo_triangle(self.cmesh)
         self.buildFromC(self.cmesh)
     def generateFromTriangleFiles(self,filebase,base):
-        from .import cmeshTools
+        from . import cmeshTools
         self.cmesh = cmeshTools.CMesh()
         cmeshTools.generateFromTriangleFiles(self.cmesh,filebase,base)
         cmeshTools.allocateGeometricInfo_triangle(self.cmesh)
         cmeshTools.computeGeometricInfo_triangle(self.cmesh)
         self.buildFromC(self.cmesh)
     def writeTriangleFiles(self,filebase,base):
-        from .import cmeshTools
+        from . import cmeshTools
         cmeshTools.writeTriangleFiles(self.cmesh,filebase,base)
     def generateFrom2DMFile(self,filebase,base=1):
-        from .import cmeshTools
+        from . import cmeshTools
         self.cmesh = cmeshTools.CMesh()
         cmeshTools.generateFrom2DMFile(self.cmesh,filebase,base)
         cmeshTools.allocateGeometricInfo_triangle(self.cmesh)

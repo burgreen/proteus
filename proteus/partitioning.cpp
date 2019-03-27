@@ -1,4 +1,5 @@
 #include "partitioning.h"
+#include "msu/mesh_msu.h"
 
 namespace proteus
 {
@@ -2953,6 +2954,7 @@ int partitionNodesFromTetgenFiles(const MPI_Comm& PROTEUS_COMM_WORLD, const char
   PetscLogStagePop();
   PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
   ierr = enforceMemoryLimit(PROTEUS_COMM_WORLD, rank, max_rss_gb,"Done with partitioning!");CHKERRABORT(PROTEUS_COMM_WORLD, ierr);
+  mesh_msu_readBC_tetgen_parallel( *newMesh.subdomainp, filebase, indexBase );
   return 0;
 }
 

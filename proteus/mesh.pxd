@@ -53,6 +53,19 @@ cdef extern from "mesh.h":
       int *edgeNumbering_subdomain2global
       Mesh* subdomainp
 
+      // msu data
+      int     num_attrF;
+      int*    attrF;
+      double* nx_mean;
+      double* ny_mean;
+      double* nz_mean;
+      double* nx_stddev;
+      double* ny_stddev;
+      double* nz_stddev;
+      int     hex_nx;
+      int     hex_ny;
+      int     hex_nz;
+
     cdef inline void initializeMesh(Mesh& mesh)
 
     cdef inline void deleteMesh(Mesh& mesh)

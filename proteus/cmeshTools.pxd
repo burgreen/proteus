@@ -87,4 +87,17 @@ cdef class CMesh:
         cdef double h,
         cdef double hMin,
         cdef double sigmaMax,
-        cdef double volume
+        cdef double volume,
+
+        // msu data
+        cdef int         num_attrF,
+        cdef np.ndarray  attrF,
+        cdef np.ndarray  nx_mean,
+        cdef np.ndarray  ny_mean,
+        cdef np.ndarray  nz_mean,
+        cdef np.ndarray  nx_stddev,
+        cdef np.ndarray  ny_stddev,
+        cdef np.ndarray  nz_stddev,
+        cdef int         hex_nx,
+        cdef int         hex_ny,
+        cdef int         hex_nz
