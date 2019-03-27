@@ -26,7 +26,7 @@ class MeshFileDomain(Domain.D_base):
         self.interiorEdgeTags = []
 
     def get_bcIdx( self, flag ):
-        print 'flag=',flag
+        print( 'flag=',flag )
         return self.meshtag_bcIdx[flag]
 
     def bc_zone_define( self, name=None, meshtag=None, condition={'type':'undefined'} ):
@@ -60,8 +60,8 @@ class MeshFileDomain(Domain.D_base):
 
     def print_bc_attrs( self, mesh ):
 
-        print 'mesh.num_attr:', mesh.num_attrF
-        for i in range(mesh.num_attrF): print 'attrF:', mesh.attrF[i] 
+        print( 'mesh.num_attr:', mesh.num_attrF )
+        for i in range(mesh.num_attrF): print( 'attrF:', mesh.attrF[i]  )
 
     def set_bc_definitions( self, mesh ):
 
@@ -83,8 +83,8 @@ class MeshFileDomain(Domain.D_base):
                   normal[1] = mesh.ny_mean[i]
                   normal[2] = mesh.nz_mean[i]
             if not used: 
-               #print 'mesh.num_attr:', mesh.num_attrF
-               #for i in range(mesh.num_attrF): print 'attrF:', mesh.attrF[i] 
+               #print( 'mesh.num_attr:', mesh.num_attrF )
+               #for i in range(mesh.num_attrF): print( 'attrF:', mesh.attrF[i]  )
                #raise RuntimeError("meshtag not found: " + str(meshtag))
                continue
 
@@ -101,7 +101,7 @@ class MeshFileDomain(Domain.D_base):
               if 'AxisOriented' in typename:  
                  for i in range(3): normal[i] = int(round(normal[i])) # nint
                  set_bc_Tank( bc, normal )
-                 print zone['meshtag'], self.meshtag_bcIdx[zone['meshtag']], zone['name'], normal
+                 print( zone['meshtag'], self.meshtag_bcIdx[zone['meshtag']], zone['name'], normal )
               else:
                  raise RuntimeError("curved Tank not supported yet")
   
@@ -120,7 +120,7 @@ class MeshFileDomain(Domain.D_base):
                elif 'rans2p' in typename:  
                  set_bc_velocityInlet_rans2p( bc, condition, normal )
                elif 'rans3p' in typename:  
-                 print 'normal',normal
+                 print( 'normal',normal )
                  set_bc_velocityInlet_rans3p( bc, condition, normal )
                else:
                  set_bc_velocityInlet( bc, condition, normal )
