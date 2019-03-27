@@ -539,12 +539,12 @@ class NS_base(object):  # (HasTraits):
 
                      #exF = mesh.subdomainMesh.nExteriorElementBoundaries_global
                      #inF = mesh.subdomainMesh.nInteriorElementBoundaries_global
-                     #print comm.rank(),exF,inF,exF+inF
-                     #if comm.rank() == 1: print dir(mesh.subdomainMesh)
-                     #if comm.rank() == 1: print (mesh.nodeDict)
-                     #if comm.rank() == 1: print len(mesh.subdomainMesh.oldToNewNode)
-                     #if comm.rank() == 1: print len(mesh.subdomainMesh.oldToNewNode)
-                     #print 'comm.size()', comm.size()
+                     #print( comm.rank(),exF,inF,exF+inF )
+                     #if comm.rank() == 1: print( dir(mesh.subdomainMesh) )
+                     #if comm.rank() == 1: print( (mesh.nodeDict) )
+                     #if comm.rank() == 1: print( len(mesh.subdomainMesh.oldToNewNode) )
+                     #if comm.rank() == 1: print( len(mesh.subdomainMesh.oldToNewNode) )
+                     #print( 'comm.size()', comm.size() )
                      #sys.exit();
 
                 elif names[1] in ['hex']:
@@ -561,7 +561,7 @@ class NS_base(object):  # (HasTraits):
                   n.nnx = mesh.hex_nx
                   n.nny = mesh.hex_ny
                   n.nnz = mesh.hex_nz
-                  print 'nx,ny,nz', n.nnx, n.nny, n.nnz
+                  print('nx,ny,nz', n.nnx, n.nny, n.nnz)
 
                   mlMesh = MeshTools.MultilevelHexahedralMesh(
                       0, 0, 0,
@@ -578,10 +578,10 @@ class NS_base(object):  # (HasTraits):
                        parallelPartitioningType=n.parallelPartitioningType )
 
                   #import pdb; pdb.set_trace()
-                  print mesh
+                  print(mesh)
                   ar = Archiver.XdmfArchive('.','out')
                   ar.allGather()
-                  print ar
+                  print(ar)
                   mesh.writeMeshXdmf(ar,'zout')
 
                 else:
@@ -1763,9 +1763,9 @@ class NS_base(object):  # (HasTraits):
        #                         m.uList,
        #                         m.rList):
        #     lm.getResidual(lu,lr)
-       #     print "Initial Field \n %s" % lu
-       #     print "Initial Residual \n %s" % lr
-       #     print "Min / Max residual %s / %s" %(lr.min(),lr.max())
+       #     print("Initial Field \n %s" % lu)
+       #     print( "Initial Residual \n %s" % lr)
+       #     print( "Min / Max residual %s / %s" %(lr.min(),lr.max()))
 
         self.nSequenceSteps = 0
         nSequenceStepsLast=self.nSequenceSteps # prevent archiving the same solution twice
