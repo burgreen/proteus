@@ -234,6 +234,14 @@ def set_bc_outflow( bc, condition ):
     #bc.v_advective.setConstantBC(0.)
     #bc.w_advective.setConstantBC(0.)
 
+    bc.k_dirichlet.uOfXT = constant(0.)
+    bc.k_advective.uOfXT = None
+    bc.k_diffusive.uOfXT = constant(0.)
+
+    bc.dissipation_dirichlet.uOfXT = constant(0.)
+    bc.dissipation_advective.uOfXT = None
+    bc.dissipation_diffusive.uOfXT = constant(0.)
+    
     #Vmag = 0.
     #if 'Vmag' in condition: Vmag = condition['Vmag']
     #bc.p_advective.setConstantBC(Vmag)
@@ -251,6 +259,11 @@ def set_bc_velocityInlet( bc, condition, normal ):
     Vmag = 0.
     if 'Vmag' in condition: Vmag = condition['Vmag']
 
+    turb_k = 0.
+    turb_e = 0.
+    if 'turb_k' in condition: turb_k = condition['turb_k']
+    if 'turb_e' in condition: turb_k = condition['turb_e']
+
     bc.u_dirichlet.setConstantBC(Vmag*normal[0])
     bc.v_dirichlet.setConstantBC(Vmag*normal[1])
     bc.w_dirichlet.setConstantBC(Vmag*normal[2])
@@ -258,6 +271,14 @@ def set_bc_velocityInlet( bc, condition, normal ):
     if 'u_xt' in condition: bc.u_dirichlet.uOfXT = condition['u_xt']
     if 'v_xt' in condition: bc.v_dirichlet.uOfXT = condition['v_xt']
     if 'w_xt' in condition: bc.w_dirichlet.uOfXT = condition['w_xt']
+
+    bc.k_dirichlet.uOfXT = constant(turb_k)
+    #bc.k_advective.
+    #bc.k_diffusive.
+
+    bc.dissipation_dirichlet.uOfXT = constant(turb_e)
+    #bc.dissipation_advective.
+    #bc.dissipation_diffusive.
 
     bc.p_advective.setConstantBC(-Vmag)
 
