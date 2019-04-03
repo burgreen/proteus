@@ -276,6 +276,11 @@ def set_bc_velocityInlet_rans2p( bc, condition, normal ):
     Vmag_air   = Vmag*0
     Vmag_water = Vmag
 
+    turb_k = 0.
+    turb_e = 0.
+    if 'turb_k' in condition: turb_k = condition['turb_k']
+    if 'turb_e' in condition: turb_k = condition['turb_e']
+
     sdf   = condition['sdf']
     fluid = condition['fluid']
 
@@ -346,6 +351,14 @@ def set_bc_velocityInlet_rans2p( bc, condition, normal ):
     if 'u_xt' in condition: bc.u_dirichlet.uOfXT = condition['u_xt']
     if 'v_xt' in condition: bc.v_dirichlet.uOfXT = condition['v_xt']
     if 'w_xt' in condition: bc.w_dirichlet.uOfXT = condition['w_xt']
+
+    bc.k_dirichlet.uOfXT = constant(turb_k)
+    #bc.k_advective.
+    #bc.k_diffusive.
+
+    bc.dissipation_dirichlet.uOfXT = constant(turb_e)
+    #bc.dissipation_advective.
+    #bc.dissipation_diffusive.
 
     bc.vof_dirichlet.uOfXT = vof_dirichlet
     bc.vof_advective.uOfXT = constant(0.)
@@ -422,6 +435,14 @@ def set_bc_outflow_rans2p( bc, condition ):
     bc.w_advective.uOfXT = None
     bc.w_diffusive.uOfXT = constant(0.)
 
+    bc.k_dirichlet.uOfXT = constant(0.)
+    bc.k_advective.uOfXT = None
+    bc.k_diffusive.uOfXT = constant(0.)
+
+    bc.dissipation_dirichlet.uOfXT = constant(0.)
+    bc.dissipation_advective.uOfXT = None
+    bc.dissipation_diffusive.uOfXT = constant(0.)
+
     bc.vof_dirichlet.uOfXT = vof_dirichlet
     bc.vof_advective.uOfXT = None
     ##.vof_diffusive.uOfXT = does not exist
@@ -477,7 +498,7 @@ def set_bc_NoSlip( bc ):
     bc.vof_advective.setConstantBC(0.)
     #bc.vof_dissipation.
 
-    bc.k_dirichlet.setConstantBC(0.)  
+    bc.k_dirichlet.setConstantBC(0.001)  
     #bc.k_advective.
     bc.k_diffusive.setConstantBC(0.)
 
@@ -525,7 +546,8 @@ def set_bc_FreeSlip( bc ):
     bc.vof_advective.setConstantBC(0.)
     bc.vof_dirichlet.uOfXT = None
 
-    bc.k_dirichlet.setConstantBC(0.) 
+    bc.k_dirichlet.uOfXT = None
+    #bc.k_dirichlet.setConstantBC(0.) 
     bc.k_diffusive.setConstantBC(0.)
     #bc.k_advective.
 
