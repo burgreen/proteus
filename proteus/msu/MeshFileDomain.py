@@ -475,7 +475,15 @@ def set_bc_NoSlip( bc ):
 
     bc.vof_dirichlet.uOfXT = None
     bc.vof_advective.setConstantBC(0.)
-    bc.vof_dirichlet.uOfXT = None
+    #bc.vof_dissipation.
+
+    bc.k_dirichlet.setConstantBC(0.)  
+    #bc.k_advective.
+    bc.k_diffusive.setConstantBC(0.)
+
+    #bc.dissipation_dirichlet.
+    #bc.dissipation_advective.
+    bc.dissipation_diffusive.setConstantBC(0.)   
 
     bc.p_dirichlet.uOfXT = None
     bc.p_advective.setConstantBC(0.)
@@ -493,10 +501,6 @@ def set_bc_NoSlip( bc ):
     bc.us_dirichlet.setConstantBC(0.)
     bc.vs_dirichlet.setConstantBC(0.)
     bc.ws_dirichlet.setConstantBC(0.)  
-    bc.k_dirichlet.setConstantBC(0.)  
-    bc.k_diffusive.setConstantBC(0.)
-    bc.dissipation_diffusive.setConstantBC(0.)   
-
 
 def set_bc_FreeSlip( bc ):
     '''
@@ -521,6 +525,14 @@ def set_bc_FreeSlip( bc ):
     bc.vof_advective.setConstantBC(0.)
     bc.vof_dirichlet.uOfXT = None
 
+    bc.k_dirichlet.setConstantBC(0.) 
+    bc.k_diffusive.setConstantBC(0.)
+    #bc.k_advective.
+
+    #bc.dissipation_dirichlet.
+    #bc.dissipation_advective.
+    bc.dissipation_diffusive.setConstantBC(0.)  
+    
     bc.p_dirichlet.uOfXT = None
     bc.p_advective.setConstantBC(0.)
     #bc.p_diffusive.uOfXT = None
@@ -534,7 +546,6 @@ def set_bc_FreeSlip( bc ):
     bc.pInit_diffusive.setConstantBC(0.)
 
     # dirichlet
-    bc.k_dirichlet.setConstantBC(0.) 
     # advective        
     bc.us_advective.setConstantBC(0.)
     bc.vs_advective.setConstantBC(0.)
@@ -544,8 +555,6 @@ def set_bc_FreeSlip( bc ):
     bc.us_diffusive.setConstantBC(0.)
     bc.vs_diffusive.setConstantBC(0.)
     bc.ws_diffusive.setConstantBC(0.)
-    bc.k_diffusive.setConstantBC(0.)
-    bc.dissipation_diffusive.setConstantBC(0.)  
 
 def set_bc_velocityInlet_rans3p( bc, condition, normal ):
     """
