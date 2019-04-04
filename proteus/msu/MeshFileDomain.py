@@ -238,11 +238,11 @@ def set_bc_outflow( bc, condition ):
     #bc.v_advective.setConstantBC(0.)
     #bc.w_advective.setConstantBC(0.)
 
-    bc.k_dirichlet.uOfXT = constant(0.)
+    bc.k_dirichlet.uOfXT = None
     bc.k_advective.uOfXT = None
     bc.k_diffusive.uOfXT = constant(0.)
 
-    bc.dissipation_dirichlet.uOfXT = constant(0.)
+    bc.dissipation_dirichlet.uOfXT = None
     bc.dissipation_advective.uOfXT = None
     bc.dissipation_diffusive.uOfXT = constant(0.)
 
@@ -266,7 +266,7 @@ def set_bc_velocityInlet( bc, condition, normal ):
     turb_k = 0.
     turb_e = 0.
     if 'turb_k' in condition: turb_k = condition['turb_k']
-    if 'turb_e' in condition: turb_k = condition['turb_e']
+    if 'turb_e' in condition: turb_e = condition['turb_e']
 
     def constant(c):
         def function(x,t): return c
@@ -573,16 +573,16 @@ def set_bc_FreeSlip( bc ):
 
     bc.vof_dirichlet.uOfXT = None
     bc.vof_advective.setConstantBC(0.)
-    bc.vof_dirichlet.uOfXT = None
+    #bc.vof_diffusive.
 
     #bc.k_dirichlet.uOfXT = None
     #bc.k_dirichlet.setConstantBC(0.) 
-    bc.k_diffusive.setConstantBC(0.)
     #bc.k_advective.
+    bc.k_diffusive.setConstantBC(0.)
 
     #bc.dissipation_dirichlet.
-    bc.dissipation_diffusive.setConstantBC(0.)  
     #bc.dissipation_advective.
+    bc.dissipation_diffusive.setConstantBC(0.)  
     
     bc.p_dirichlet.uOfXT = None
     bc.p_advective.setConstantBC(0.)
