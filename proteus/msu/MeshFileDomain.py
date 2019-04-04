@@ -229,7 +229,7 @@ def set_bc_outflow( bc, condition ):
     def constant(c):
         def function(x,t): return c
         return function
-        
+
     bc.p_dirichlet.setConstantBC(0.)
     bc.u_diffusive.setConstantBC(0.)
     bc.v_diffusive.setConstantBC(0.)
@@ -527,7 +527,7 @@ def set_bc_NoSlip( bc ):
     bc.vof_advective.setConstantBC(0.)
     #bc.vof_dissipation.
 
-    bc.k_dirichlet.setConstantBC(0.001)  
+    #bc.k_dirichlet.
     #bc.k_advective.
     bc.k_diffusive.setConstantBC(0.)
 
@@ -575,14 +575,14 @@ def set_bc_FreeSlip( bc ):
     bc.vof_advective.setConstantBC(0.)
     bc.vof_dirichlet.uOfXT = None
 
-    bc.k_dirichlet.uOfXT = None
+    #bc.k_dirichlet.uOfXT = None
     #bc.k_dirichlet.setConstantBC(0.) 
     bc.k_diffusive.setConstantBC(0.)
     #bc.k_advective.
 
     #bc.dissipation_dirichlet.
-    #bc.dissipation_advective.
     bc.dissipation_diffusive.setConstantBC(0.)  
+    #bc.dissipation_advective.
     
     bc.p_dirichlet.uOfXT = None
     bc.p_advective.setConstantBC(0.)
