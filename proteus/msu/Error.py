@@ -37,9 +37,9 @@ def fatal( *args ):
       #s.write( args[0] % args[1:] )
       #raise RuntimeError, s.getvalue()
       str = args[0] % (args[1:])
-      raise RuntimeError, str
+      raise RuntimeError('str')
    else:
-      raise RuntimeError, args[0]
+      raise RuntimeError(args[0])
 
 #----------------------------------------------
 def warning( *args ):
