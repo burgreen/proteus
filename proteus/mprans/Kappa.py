@@ -288,6 +288,10 @@ independently and lagged in time
             self.ebq_phi = None
             self.ebqe_phi = None
         # msu-turb end
+        else:
+            self.q_phi =-numpy.ones( modelList[self.dissipation_modelIndex].q[('u', 0)].shape, 'd')
+            #self.ebq_phi =-numpy.ones( modelList[self.dissipation_modelIndex].ebq[('u', 0)].shape, 'd')
+            self.ebqe_phi = -numpy.ones( modelList[self.dissipation_modelIndex].ebqe[('u', 0)].shape, 'd')
         # flow model
         assert self.flowModelIndex is not None, "Kappa: invalid index for flow model allowed range: [0,%s]" % len(modelList)
         # print "flow model index------------",self.flowModelIndex,modelList[self.flowModelIndex].q.has_key(('velocity',0))
