@@ -796,7 +796,6 @@ class Coefficients(proteus.TransportCoefficients.TC_base):
                      repr(self.netForces_p[:,:]) +
                      "\nForces_v\n" +
                      repr(self.netForces_v[:,:]))
-                     `self.netForces_v[:,:]`)
             self.timeHistory.write("%21.16e\n" % (t,))
             self.timeHistory.flush()
             self.wettedAreaHistory.write("%21.16e\n" % (self.wettedAreas[-1],))
