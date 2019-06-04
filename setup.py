@@ -637,6 +637,7 @@ def setup_given_extensions(extensions):
                       'proteus.richards',
                       'proteus.elastoplastic',
                       'proteus.mbd',
+                      'proteus.msu',
                       'proteus.test_utils',
                       'proteus.config',
                       'proteus.tests',
