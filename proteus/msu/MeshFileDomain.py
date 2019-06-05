@@ -513,15 +513,15 @@ def set_bc_NoSlip( bc ):
 
     bc.u_dirichlet.setConstantBC(0.)
     bc.u_advective.uOfXT = None
-    bc.u_diffusive.setConstantBC(0.) # do this? 2018.10.29
+    #bc.u_diffusive.setConstantBC(0.) # this should be commented out 2019.06.05
 
     bc.v_dirichlet.setConstantBC(0.)
     bc.v_advective.uOfXT = None
-    bc.v_diffusive.setConstantBC(0.) # do this? 2018.10.29
+    #bc.v_diffusive.setConstantBC(0.) # this should be commented out 2019.06.05
 
     bc.w_dirichlet.setConstantBC(0.)
     bc.w_advective.uOfXT = None
-    bc.w_diffusive.setConstantBC(0.) # do this? 2018.10.29
+    #bc.w_diffusive.setConstantBC(0.) # this should be commented out 2019.06.05
 
     bc.vof_dirichlet.uOfXT = None
     bc.vof_advective.setConstantBC(0.)
