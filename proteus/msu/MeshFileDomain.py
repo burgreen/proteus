@@ -35,6 +35,8 @@ class MeshFileDomain(Domain.D_base):
         if name == None:                raise RuntimeError('name=None')
         if name in self.bc_zone.keys(): raise RuntimeError('name already exists: {0}'.format(name) )
 
+        print('++++++ bc defined:', name, condition['type'], custom )
+
         self.bc_zone[name] = { 'name':      name, 
                                'meshtag':   meshtag, 
                                'condition': condition,
@@ -93,23 +95,25 @@ class MeshFileDomain(Domain.D_base):
 
             used = False;
 
-            if custom: 
+            print('====== bc set:', zone['name'], condition['type'], custom )
+
+            if custom and not used: 
                custom( bc, condition ); used = True;
                continue
 
-            if 'freeSlip' in typename: 
+            if 'freeSlip' in typename and not used: 
                msu_bc.freeSlip( bc ); used = True;
                continue
 
-            if 'noSlip' in typename: 
+            if 'noSlip' in typename and not used: 
                msu_bc.noSlip( bc ); used = True;
                continue
 
-            if 'processorBoundary' in typename: 
+            if 'processorBoundary' in typename and not used: 
                msu_bc.nonMaterial( bc ); used = True
                continue
 
-            if 'tank' in typename:  
+            if 'tank' in typename and not used:  
                if 'AxisOriented' in typename:  
                  for i in range(3): normal[i] = int(round(normal[i])) # nint
                  msu_bc.tank( bc, normal ); used = True
@@ -118,7 +122,7 @@ class MeshFileDomain(Domain.D_base):
                  raise RuntimeError("curved Tank not supported yet")
                continue
   
-            if 'openAir' in typename:  
+            if 'openAir' in typename and not used:  
                if 'AxisOriented' in typename:  
                  for i in range(3): normal[i] = int(round(normal[i])) # nint
                  msu_bc.openAir( bc, normal ); used = True
@@ -126,7 +130,7 @@ class MeshFileDomain(Domain.D_base):
                  raise RuntimeError("curved OpenAir not supported yet")
                continue
 
-            if 'velocityInlet' in typename: 
+            if 'velocityInlet' in typename and not used: 
                if 'AxisOriented' in typename:  
                  for i in range(3): normal[i] = int(round(normal[i])) # nint
                if 'twoPhase' in typename:  
@@ -139,7 +143,7 @@ class MeshFileDomain(Domain.D_base):
                  msu_bc.velocityInlet( bc, condition, normal ); used = True
                continue
 
-            if 'outflow' in typename: 
+            if 'outflow' in typename and not used: 
                if 'twoPhase' in typename:  
                  msu_bc.outflow_rans2p( bc, condition ); used = True
                elif 'rans2p' in typename:  
@@ -150,11 +154,11 @@ class MeshFileDomain(Domain.D_base):
                  msu_bc.outflow( bc, condition ); used =  True
                continue
 
-            if 'interior' in typename: 
+            if 'interior' in typename and not used: 
                msu_bc.interior( bc, condition ); used = True
                continue
 
-            if 'open' in typename: 
+            if 'open' in typename and not used: 
                msu_bc.open( bc, condition ); used = True
                continue
 

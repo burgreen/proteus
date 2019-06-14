@@ -293,14 +293,17 @@ class Coefficients(proteus.TransportCoefficients.TC_base):
             else:
                 self.ebq_phi = None
         # msu-turb start
-        else:
-            self.q_phi = None
-            self.ebq_phi = None
-            self.ebqe_phi = None
         #else:
-        #    self.q_phi =-numpy.ones( modelList[self.kappa_modelIndex].q[('u', 0)].shape, 'd')
-        #    #self.ebq_phi =-numpy.ones( modelList[self.dissipation_modelIndex].ebq[('u', 0)].shape, 'd')
-        #    self.ebqe_phi = -numpy.ones( modelList[self.kappa_modelIndex].ebqe[('u', 0)].shape, 'd')
+        #    self.q_phi = None
+        #    self.ebq_phi = None
+        #    self.ebqe_phi = None
+        else:
+            #self.q_phi = -numpy.ones( modelList[self.kappa_modelIndex].q[('u', 0)].shape, 'd')
+            ##self.ebq_phi =-numpy.ones( modelList[self.dissipation_modelIndex].ebq[('u', 0)].shape, 'd')
+            #self.ebqe_phi = -numpy.ones( modelList[self.kappa_modelIndex].ebqe[('u', 0)].shape, 'd')
+            self.q_phi = -numpy.ones( modelList[self.modelIndex].q[('u', 0)].shape, 'd')
+            #self.ebq_phi =-numpy.ones( modelList[self.modelIndex].ebq[('u', 0)].shape, 'd')
+            self.ebqe_phi = -numpy.ones( modelList[self.modelIndex].ebqe[('u', 0)].shape, 'd')
         ## msu-turb end
         # flow model
         self.u_old_dof = numpy.copy(self.model.u[0].dof)
