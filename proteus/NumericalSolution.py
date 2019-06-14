@@ -1495,6 +1495,7 @@ class NS_base(object):  # (HasTraits):
             domain = p0.myTpFlowProblem.domain
         else:
             domain = p0.domain
+
         if (hasattr(domain, 'PUMIMesh') and
             domain.PUMIMesh.adaptMesh() and
             self.so.useOneMesh): #and
