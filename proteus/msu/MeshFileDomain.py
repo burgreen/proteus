@@ -8,7 +8,6 @@ from proteus.mprans import BoundaryConditions as bc
 from proteus import Domain
 from proteus.ctransportCoefficients import smoothedHeaviside
 from proteus import default_p
-from proteus.msu import msu_bc as msu_bc
 
 class MeshFileDomain(Domain.D_base):
     """
@@ -30,17 +29,17 @@ class MeshFileDomain(Domain.D_base):
         print( 'flag=',flag )
         return self.meshtag_bcIdx[flag]
 
-    def bc_zone_define( self, name=None, meshtag=None, condition={'type':'undefined'}, custom=None ):
+    def bc_zone_define( self, name=None, meshtag=None, condition={'method':None} ):
 
         if name == None:                raise RuntimeError('name=None')
         if name in self.bc_zone.keys(): raise RuntimeError('name already exists: {0}'.format(name) )
+        if condition['method'] == None: raise RuntimeError('bc method is not assigned')
 
-        print('++++++ bc defined:', name, condition['type'], custom )
+        print('++++++ bc defined:', name, condition['method'] )
 
         self.bc_zone[name] = { 'name':      name, 
                                'meshtag':   meshtag, 
                                'condition': condition,
-                               'custom':    custom,
                                'bc_rans':   bc.BC_RANS(nd=self.dim,name=name) }
 
         self.bc_zones.append( self.bc_zone[name] )
@@ -76,8 +75,7 @@ class MeshFileDomain(Domain.D_base):
             bc        = zone['bc_rans']
             condition = zone['condition']
             meshtag   = zone['meshtag']
-            custom    = zone['custom']
-            typename  = condition['type']
+            method    = condition['method']
             
             normal = [0,0,0]
             used = False
@@ -93,75 +91,6 @@ class MeshFileDomain(Domain.D_base):
                #raise RuntimeError("meshtag not found: " + str(meshtag))
                continue
 
-            used = False;
+            condition['_normal'] = normal
 
-            print('====== bc set:', zone['name'], condition['type'], custom )
-
-            if custom and not used: 
-               custom( bc, condition ); used = True;
-               continue
-
-            if 'freeSlip' in typename and not used: 
-               msu_bc.freeSlip( bc ); used = True;
-               continue
-
-            if 'noSlip' in typename and not used: 
-               msu_bc.noSlip( bc ); used = True;
-               continue
-
-            if 'processorBoundary' in typename and not used: 
-               msu_bc.nonMaterial( bc ); used = True
-               continue
-
-            if 'tank' in typename and not used:  
-               if 'AxisOriented' in typename:  
-                 for i in range(3): normal[i] = int(round(normal[i])) # nint
-                 msu_bc.tank( bc, normal ); used = True
-                 print( zone['meshtag'], self.meshtag_bcIdx[zone['meshtag']], zone['name'], normal )
-               else:
-                 raise RuntimeError("curved Tank not supported yet")
-               continue
-  
-            if 'openAir' in typename and not used:  
-               if 'AxisOriented' in typename:  
-                 for i in range(3): normal[i] = int(round(normal[i])) # nint
-                 msu_bc.openAir( bc, normal ); used = True
-               else:
-                 raise RuntimeError("curved OpenAir not supported yet")
-               continue
-
-            if 'velocityInlet' in typename and not used: 
-               if 'AxisOriented' in typename:  
-                 for i in range(3): normal[i] = int(round(normal[i])) # nint
-               if 'twoPhase' in typename:  
-                 msu_bc.velocityInlet_rans2p( bc, condition, normal ); used = True
-               elif 'rans2p' in typename:  
-                 msu_bc.velocityInlet_rans2p( bc, condition, normal ); used = True
-               elif 'rans3p' in typename:  
-                 msu_bc.velocityInlet_rans3p( bc, condition, normal ); used = True
-               else:
-                 msu_bc.velocityInlet( bc, condition, normal ); used = True
-               continue
-
-            if 'outflow' in typename and not used: 
-               if 'twoPhase' in typename:  
-                 msu_bc.outflow_rans2p( bc, condition ); used = True
-               elif 'rans2p' in typename:  
-                 msu_bc.outflow_rans2p( bc, condition ); used = True
-               elif 'rans3p' in typename:  
-                 msu_bc.outflow_rans3p( bc, condition ); used = True
-               else:
-                 msu_bc.outflow( bc, condition ); used =  True
-               continue
-
-            if 'interior' in typename and not used: 
-               msu_bc.interior( bc, condition ); used = True
-               continue
-
-            if 'open' in typename and not used: 
-               msu_bc.open( bc, condition ); used = True
-               continue
-
-        if not used:
-          print('typename =', typename )
-          sys.exit('bc not handled in msu/MeshFileDomain.py')
+            method( bc, condition )

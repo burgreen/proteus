@@ -1,5 +1,7 @@
 # msu/msu_bc.py
 
+# old file -- do not use
+
 import sys
 #import numpy as np
 #from proteus.Profiling import logEvent
