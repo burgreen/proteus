@@ -1759,19 +1759,23 @@ class NS_base(object):  # (HasTraits):
             else:
                 logEvent("No initial conditions provided for model "+p.name)
         if self.opts.hotStart:
-            if time >= self.tnList[-1] - 1.0e-5:
-                logEvent("Modifying time interval to be tnList[-1] + tnList since tnList hasn't been modified already")
-                ndtout = len(self.tnList)
-                self.tnList = [time + i for i in self.tnList]
-                self.tnList.insert(1, 0.9*self.tnList[0]+0.1*self.tnList[1])
-
-            else:
-                tnListNew=[time]
-                for n,t in enumerate(self.tnList):
-                    if time < t-1.0e-8:
-                        tnListNew.append(t)
-                self.tnList=tnListNew
-                logEvent("Hotstarting, new tnList is"+repr(self.tnList))
+            # msu-start
+            #if time >= self.tnList[-1] - 1.0e-5:
+            #    logEvent("Modifying time interval to be tnList[-1] + tnList since tnList hasn't been modified already")
+            #    ndtout = len(self.tnList)
+            #    self.tnList = [time + i for i in self.tnList]
+            #    self.tnList.insert(1, 0.9*self.tnList[0]+0.1*self.tnList[1])
+            #
+            #else:
+            #    tnListNew=[time]
+            #    for n,t in enumerate(self.tnList):
+            #        if time < t-1.0e-8:
+            #            tnListNew.append(t)
+            #    self.tnList=tnListNew
+            #    logEvent("Hotstarting, new tnList is"+repr(self.tnList))
+            logEvent("Modifying time interval to be time + tnList")
+            self.tnList = [time + t for t in self.tnList]
+            # msu-end
         else:
             self.tCount=0#time step counter
 
