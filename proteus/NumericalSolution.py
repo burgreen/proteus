@@ -1775,6 +1775,7 @@ class NS_base(object):  # (HasTraits):
             #    logEvent("Hotstarting, new tnList is"+repr(self.tnList))
             logEvent("Modifying time interval to be time + tnList")
             self.tnList = [time + t for t in self.tnList]
+            logEvent("Hotstarting, new tnList is"+repr(self.tnList))
             # msu-end
         else:
             self.tCount=0#time step counter
